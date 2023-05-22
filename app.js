@@ -6,7 +6,7 @@ const cors = require("cors");
 require("dotenv/config");
 const authJwt = require("./helpers/jwt");
 const errorHandler = require("./helpers/error-handler");
-const CitySchema = require("./models/cities");
+
 
 app.use(cors());
 app.options("*", cors());
@@ -20,20 +20,22 @@ app.use(errorHandler);
 
 //Routes
 const usersRoutes = require("./routes/users");
-const selectBestHub = require("./helpers/hubSelection");
-// const hubRoutes = require('./routes/shortesthub');
+const citiesRoutes = require("./routes/cities");
+// const selectBestHub = require("./helpers/hubSelection");
+const hubRoutes = require('./routes/shortesthub');
 
 const api = process.env.API_URL;
 
 app.use(`${api}/users`, usersRoutes);
-// app.use(`${api}/hubs`, hubRoutes);
+app.use(`${api}/cities`, citiesRoutes);
+app.use(`${api}/hubs`, hubRoutes);
 
 //Database
 mongoose
   .connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    dbName: "ulip",
+    dbName: process.env.DB_NAME,
   })
   .then(() => {
     console.log("Database Connection is ready...");
