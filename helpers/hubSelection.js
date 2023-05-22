@@ -4,6 +4,7 @@ const {
   distanceWeight,
   infraWeight,
 } = require("../data/constants");
+const City = require("../models/cities");
 
 /**
  * A function that selects the best hub for a given set of spokes based on the minimization of the cost function
@@ -14,13 +15,15 @@ const {
  *
  * @returns {Object} An object that contains the details of the best hub
  */
-function selectBestHub(spokeIds, cities) {
+async function selectBestHub(spokeIds) {
+ let cities =  await City.find({});
   let minCost = Infinity;
   let bestHub = null;
 
   cities.forEach((city) => {
     
     if (city.typeOfCity === "hub") {
+    
       let graphNodeIds = new Array(...spokeIds);
 
       if (!graphNodeIds.includes(city._id)) {
