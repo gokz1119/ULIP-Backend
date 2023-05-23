@@ -1,17 +1,17 @@
 const expressJwt = require('express-jwt');
 
-function authJwt() {
+ function authJwt() {
     const secret = process.env.secret;
     const api = process.env.API_URL;
-    return expressJwt({
+    return  expressJwt({
         secret,
         algorithms: ['HS256'],
-        isRevoked: isRevoked
+        // isRevoked: isRevoked,
     }).unless({
         path: [
             `${api}/cities`,
-            `${api}/hubs/findhub`,
-            `${api}/hubs/addshipment`,
+            // `${api}/hubs/findhub`,
+            // `${api}/hubs/addshipment`,
             `${api}/users/`,
             `${api}/users/login`,
             `${api}/users/register`,
@@ -19,13 +19,13 @@ function authJwt() {
     })
 }
 
-async function isRevoked(req, payload, done) {
-    if(!payload.isAdmin) {
-        done(null, true)
-    }
+// async function isRevoked(req, payload, done) {
+//     if(!payload.isAdmin) {
+//         done(null, true)
+//     }
 
-    done();
-}
+//     done();
+// }
 
 
 

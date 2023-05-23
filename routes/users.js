@@ -53,17 +53,18 @@ router.put('/:id',async (req, res)=> {
 })
 
 router.post('/login', async (req,res) => {
+    console.log(`inside user LOGIN API`)
     const user = await User.findOne({email: req.body.email})
     const secret = process.env.secret;
     if(!user) {
         return res.status(400).send('The user not found');
     }
-
+    console.log(user)
     if(user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
         const token = jwt.sign(
             {
-                userId: user.id,
-                isAdmin: user.isAdmin
+                userId: user._id,
+                // isAdmin: user.typeofUser
             },
             secret,
             {expiresIn : '1d'}
@@ -84,7 +85,8 @@ router.post('/register', async (req,res)=>{
         email: req.body.email,
         passwordHash: bcrypt.hashSync(req.body.password, 10),
         phone: req.body.phone,
-        typeofUser:req.body.typeofUser
+        typeofUser:req.body.typeofUser,
+        companyName:req.body.companyName
     })
     user = await user.save();
 
