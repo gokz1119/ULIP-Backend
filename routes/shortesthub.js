@@ -38,15 +38,17 @@ router.post('/findHub', async (req, res) => {
   res.send(`The hub with the shortest average distance is ${hub}`);
 });
 function userIdfromToken(token) {
+  let userId;
   jwt.verify(token,process.env.secret, (err, decoded) => {
     if (err) {
       console.error('JWT verification failed:', err);
       return;
     }
-  
-    // Extract the user ID from the decoded payload
-    return decoded.userId;
+    console.log("Decoded userID",decoded.userId);
+    userId= decoded.userId;    
 })
+// Extract the user ID from the decoded payload
+return userId;
 }
 router.post('/addshipment', async (req, res) => {
   
@@ -92,7 +94,8 @@ router.get('/shipmenthistory', async (req, res) => {
   try {
     let token = req.headers['authorization'].split("Bearer ")[1];
     let userId = await userIdfromToken(token);
-    const shipmentRequests = await Shipment.find({ userId:userId });
+    console.log("userID",userId)
+    const shipmentRequests = await Shipment.find({ userId:{ $eq: userId} });
     console.log(shipmentRequests)
     res.status(200).json({ shipmentDetails:shipmentRequests });
 
