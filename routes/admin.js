@@ -10,9 +10,10 @@ function adminVerify(token) {
         console.error('JWT verification failed:', err);
         isAdmin = false;
       } 
-
-      if(decoded.typeofUser=="ADMIN"){
+        console.log("Type of user",decoded.isAdmin)
+      if(decoded.isAdmin=="ADMIN"){
         isAdmin = true;
+        console.log("ISADMIN TRue")
       }
   })
   return isAdmin;
@@ -20,6 +21,7 @@ function adminVerify(token) {
 
 router.post('/statusupdate',async (req, res) => {
     let token = req.headers['authorization'].split("Bearer ")[1];
+    console.log("tokennn",token)
     let isAdmin = adminVerify(token)
     if(!isAdmin){
         res.send("User has no ADMIN privileages")
