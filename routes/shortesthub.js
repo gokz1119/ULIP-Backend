@@ -10,43 +10,47 @@ const jwt = require("jsonwebtoken");
 require("dotenv/config");
 const City = require("../models/cities");
 
-
 // Define a route for the POST request to pass hub information
 router.post("/findHub", async (req, res) => {
-  // Get the hub information from the request body
-  console.log("insid findHub API");
-  // const hubs = req.body.hubs;
-  // console.log(hubs)
-  let date = new Date(req.body.date);
-  let spokeIds = await Shipment.find(
-    { date: { $eq: date } },
-    { source: 1, destination: 1, _id: 0 }
-  );
-  var setSpokeIds = new Set();
-  var shipmentIds = [];
-  spokeIds.forEach((element) => {
-    setSpokeIds.add(element.source);
-    setSpokeIds.add(element.destination);
-    shipmentIds.push(element._id);
-  });
-  
-  let cities =  await City.find({});
-  spokeIds = Array.from(setSpokeIds);
-  console.log(spokeIds);
-  let hub = selectBestHub(spokeIds, cities);
-  //Updates the Shipment Hub and status in MongoDB
-  Shipment.updateMany(
-    { date: { $eq: date } },
-    { $set: { hub: hub, status: statuses.ONGOINGTOHUB } },
-    (err, result) => {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log(`Result after updation ${result}`);
+  try {
+    // Get the hub information from the request body
+    console.log("insid findHub API");
+    // const hubs = req.body.hubs;
+    // console.log(hubs)
+    let date = new Date(req.body.date);
+    let spokeIds = await Shipment.find(
+      { date: { $eq: date } },
+      { source: 1, destination: 1, _id: 0 }
+    );
+    var setSpokeIds = new Set();
+    var shipmentIds = [];
+    spokeIds.forEach((element) => {
+      setSpokeIds.add(element.source);
+      setSpokeIds.add(element.destination);
+      shipmentIds.push(element._id);
+    });
+
+    let cities = await City.find({});
+    spokeIds = Array.from(setSpokeIds);
+    console.log(spokeIds);
+    let hub = selectBestHub(spokeIds, cities);
+    //Updates the Shipment Hub and status in MongoDB
+    Shipment.updateMany(
+      { date: { $eq: date } },
+      { $set: { hub: hub, status: statuses.ONGOINGTOHUB } },
+      (err, result) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(`Result after updation ${result}`);
+        }
       }
-    }
-  );
-  res.send(`The hub with the shortest average distance is ${hub}`);
+    );
+    res.status(200).send(hub);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 function userIdfromToken(token) {
@@ -107,9 +111,31 @@ router.get("/shipmenthistory", async (req, res) => {
     let token = req.headers["authorization"].split("Bearer ")[1];
     let userId = await userIdfromToken(token);
     console.log("userID", userId);
-    const shipmentRequests = await Shipment.find({ userId: { $eq: userId } }).sort({date: 1});
+    const shipmentRequests = await Shipment.find({
+      userId: { $eq: userId },
+    }).sort({ date: 1 });
     console.log(shipmentRequests);
     res.status(200).json({ shipmentDetails: shipmentRequests });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/shipmentDetails/:shipmentId", async (req, res) => {
+  try {
+    let token = req.headers["authorization"].split("Bearer ")[1];
+    let userId = await userIdfromToken(token);
+    let shipmentId = req.params.shipmentId;
+
+    const shipmentDetails = await Shipment.findById(shipmentId);
+    console.log(shipmentDetails);
+
+    if (userId == shipmentDetails.userId) {
+      res.status(200).send(shipmentDetails);
+    } else {
+      res.status(401).json({ message: "Unauthorized" });
+    }
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
