@@ -23,12 +23,14 @@ const usersRoutes = require("./routes/users");
 const citiesRoutes = require("./routes/cities");
 // const selectBestHub = require("./helpers/hubSelection");
 const hubRoutes = require('./routes/shortesthub');
+const adminRoutes = require('./routes/admin');
 
 const api = process.env.API_URL;
 
 app.use(`${api}/users`, usersRoutes);
-app.use(`${api}/cities`, citiesRoutes);
+app.use(`${api}/cities`,citiesRoutes);
 app.use(`${api}/hubs`, hubRoutes);
+app.use(`${api}/admin` ,adminRoutes);
 
 //Database
 mongoose
