@@ -116,4 +116,25 @@ router.get("/shipmenthistory", async (req, res) => {
   }
 });
 
+router.get("/shipmentDetails/:shipmentId", async (req, res) => {
+  try {
+    let token = req.headers["authorization"].split("Bearer ")[1];
+    let userId = await userIdfromToken(token);
+    let shipmentId = req.params.shipmentId;
+
+    const shipmentDetails = await Shipment.findById(shipmentId)
+    console.log(shipmentDetails);
+
+    if (userId == shipmentDetails.userId) {
+      res.status(200).send(shipmentDetails)
+    } else {
+      res.status(401).json({ message: "Unauthorized" })
+    }
+
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
 module.exports = router;
