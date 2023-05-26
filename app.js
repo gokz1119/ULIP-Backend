@@ -44,6 +44,7 @@ mongoose
     console.log("Database Connection is ready...");
   })
   .catch((err) => {
+    console.log("eeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrr")
     console.log(err);
   });
 

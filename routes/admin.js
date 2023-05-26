@@ -46,4 +46,26 @@ router.post('/statusupdate',async (req, res) => {
 })
 
 
+router.get('/allshipments',async (req, res) => {
+  let token = req.headers['authorization'].split("Bearer ")[1];
+  console.log("tokennn",token)
+  let isAdmin = adminVerify(token)
+  if(!isAdmin){
+      res.send("User has no ADMIN privileages")
+      return
+  }
+  try {
+    const shipmentRequests = await Shipment.find({});
+    console.log(shipmentRequests);
+    res.status(200).json({ shipmentDetails: shipmentRequests });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+  
+
+
+})
+
+
 module.exports =router;
