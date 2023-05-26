@@ -24,7 +24,7 @@ router.post('/statusupdate',async (req, res) => {
     console.log("tokennn",token)
     let isAdmin = adminVerify(token)
     if(!isAdmin){
-        res.send("User has no ADMIN privileages")
+        res.status(401).send("User has no ADMIN privileages")
         return
     }
     let shipmentId = req.body.shipmentId;
