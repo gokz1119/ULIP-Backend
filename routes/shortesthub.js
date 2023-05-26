@@ -67,6 +67,19 @@ function userIdfromToken(token) {
   return userId;
 }
 
+function typeOfUserfromToken(token) {
+  let typeOfUser;
+  jwt.verify(token, process.env.secret, (err, decoded) => {
+    if (err) {
+      console.error("JWT verification failed:", err);
+      return;
+    }
+    console.log("Decoded userID", decoded.isAdmin);
+    typeOfUser = decoded.isAdmin;
+  });
+  return typeOfUser;
+}
+
 router.post("/addshipment", async (req, res) => {
   let token = req.headers["authorization"].split("Bearer ")[1];
   let userId = await userIdfromToken(token);
@@ -130,8 +143,8 @@ router.get("/shipmentDetails/:shipmentId", async (req, res) => {
 
     const shipmentDetails = await Shipment.findById(shipmentId);
     console.log(shipmentDetails);
-
-    if (userId == shipmentDetails.userId) {
+    let typeofUser  = typeOfUserfromToken(token)
+    if (userId == shipmentDetails.userId || typeofUser == "ADMIN") {
       res.status(200).send(shipmentDetails);
     } else {
       res.status(401).json({ message: "Unauthorized" });
